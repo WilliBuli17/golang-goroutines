@@ -1,0 +1,296 @@
+Pengenalan Concurrency dan Parallel Programming
+
+-- Pengenalan Parallel Programming
+        Parallel programming sederhananya adalah memecahkan suatu masalah dengan cara membaginya menjadi yang lebih kecil,
+        dan dijalankan secara bersamaan pada waktu yang bersamaan pula.
+
+        Contoh Parallel
+        1. Menjalankan beberapa aplikasi sekaligus di sistem operasi kita (office, editor, browser, dan lain-lain)
+        2. Beberapa koki menyiapkan makanan di restoran, dimana tiap koki membuat makanan masing-masing
+        3. Antrian di Bank, dimana tiap teller melayani nasabah nya masing-masing
+
+        Saat kita belajar paralel programing, kita akan belajar 2 hali yaitu process dan thread
+        ---- Process                                    ||  ---- Thread
+        Process adalah sebuah eksekusi program          ||  Thread adalah segmen dari process
+        Process mengkonsumsi memory besar               ||  Thread menggunakan memory kecil
+        Process saling terisolasi dengan process lain   ||  Thread bisa saling berhubungan jika dalam process yang sama
+        Process lama untuk dijalankan atau dihentikan   ||  Thread cepat untuk dijalankan dan dihentikan
+
+        -- Parallel vs Concurrency
+                1. Berbeda dengan paralel (menjalankan beberapa pekerjaan secara bersamaan), concurrency adalah menjalankan
+                   beberapa pekerjaan secara bergantian
+                2. Dalam parallel kita biasanya membutuhkan banyak Thread, sedangkan dalam concurrency, kita hanya membutuhkan
+                   sedikit Thread
+
+                Contoh Concurrency
+                Saat kita makan di cafe, kita bisa makan, lalu ngobrol, lalu minum, makan lagi, ngobrol lagi, minum lagi, dan seterusnya.
+                Tetapi kita tidak bisa pada saat yang bersamaan minum, makan dan ngobrol, hanya bisa melakukan satu hal pada satu waktu,
+                namun bisa berganti kapanpun kita mau.
+
+        -- CPU-bound
+                1. Banyak algoritma dibuat yang hanya membutuhkan CPU untuk menjalankannya. Algoritma jenis ini biasanya sangat
+                   tergantung dengan kecepatan CPU.
+                2. Contoh yang paling populer adalah Machine Learning, oleh karena itu sekarang banyak sekali teknologi Machine Learning
+                   yang banyak menggunakan GPU karena memiliki core yang lebih banyak dibanding CPU biasanya.
+                3. Jenis algoritma seperti ini tidak ada benefitnya menggunakan Concurrency Programming, namun bisa dibantu dengan
+                   implementasi Parallel Programming.
+
+        -- I/O-bound
+                1. I/O-bound adalah kebalikan dari sebelumnya, dimana biasanya algoritma atau aplikasinya sangat tergantung
+                   dengan kecepatan input output devices yang digunakan.
+                2. Contohnya aplikasi seperti membaca data dari file, database, dan lain-lain.
+                3. Kebanyakan saat ini, biasanya kita akan membuat aplikasi jenis seperti ini.
+                4. Aplikasi jenis I/O-bound, walaupun bisa terbantu dengan implementasi Parallel Programming, tapi benefitnya akan
+                   lebih baik jika menggunakan Concurrency Programming.
+                5. Bayangkan kita membaca data dari database, dan Thread harus menunggu 1 detik untuk mendapat balasan dari database,
+                   padahal waktu 1 detik itu jika menggunakan Concurrency Programming, bisa digunakan untuk melakukan hal lain lagi
+
+-- Pengenalan Goroutine
+        1. Goroutine adalah sebuah thread ringan yang dikelola oleh Go Runtime
+        2. Ukuran Goroutine sangat kecil, sekitar 2kb, jauh lebih kecil dibandingkan Thread yang bisa sampai 1mb atau 1000kb
+        3. Namun tidak seperti thread yang berjalan parallel, goroutine berjalan secara concurrent
+
+        -- Cara Kerja Goroutine
+                1. Sebenarnya, Goroutine dijalankan oleh Go Scheduler dalam thread, dimana jumlah thread nya
+                   sebanyak GOMAXPROCS (biasanya sejumlah core CPU)
+                2. Jadi sebenarnya tidak bisa dibilang Goroutine itu pengganti Thread, karena Goroutine sendiri berjalan di atas Thread
+                3. Namun yang mempermudah kita adalah, kita tidak perlu melakukan manajemen Thread secara manual,
+                   semua sudah diatur oleh Go Scheduler
+                4. Dalam Go-Scheduler, kita akan mengenal beberapa terminologi
+                   G : Goroutine
+                   M : Thread (Machine)
+                   P : Processor
+
+        -- Goroutine Sangat Ringan
+                1. Seperti yang sebelumnya dijelaskan, bahwa goroutine itu sangat ringan
+                2. Kita bisa membuat ribuan, bahkan sampai jutaan goroutine tanpa takut boros memory
+                3. Tidak seperti thread yang ukurannya berat, goroutine sangatlah ringan
+
+        -- Membuat Goroutine
+                1. Untuk membuat goroutine di Golang sangatlah sederhana
+                2. Kita hanya cukup menambahkan perintah go sebelum memanggil function yang akan kita jalankan dalam goroutine
+                3. Saat sebuah function kita jalankan dalam goroutine, function tersebut akan berjalan secara asynchronous,
+                   artinya tidak akan ditunggu sampai function tersebut selesai
+                4. Aplikasi akan lanjut berjalan ke kode program selanjutnya tanpa menunggu goroutine yang kita buat selesai
+
+-- Pengenalan Channel
+        1. Channel adalah tempat komunikasi secara synchronous yang bisa dilakukan oleh goroutine
+        2. Di Channel terdapat pengirim dan penerima, biasanya pengirim dan penerima adalah goroutine yang berbeda
+        3. Saat melakukan pengiriman data ke Channel, goroutine akan ter-block, sampai ada yang menerima data tersebut
+        4. Maka dari itu, channel disebut sebagai alat komunikasi synchronous (blocking)
+        5. Channel cocok sekali sebagai alternatif seperti mekanisme async await yang terdapat di beberapa bahasa pemrograman lain
+
+        -- Karakteristik Channel
+                1. Secara default channel hanya bisa menampung satu data, jika kita ingin menambahkan data lagi,
+                   harus menunggu data yang ada di channel diambil
+                2. Channel hanya bisa menerima satu jenis data
+                3. Channel bisa diambil dari lebih dari satu goroutine
+                4. Channel harus di close jika tidak digunakan, atau bisa menyebabkan memory leak
+
+        -- Membuat Channel
+                1. Channel di Go-Lang direpresentasikan dengan tipe data chan
+                2. Untuk membuat channel sangat mudah, kita bisa menggunakan make(), mirip ketika membuat map
+                3. Namun saat pembuatan channel, kita harus tentukan tipe data apa yang bisa dimasukkan kedalam channel tersebut
+
+        -- Mengirim dan Menerima Data dari Channel
+                1. Seperti yang sudah dibahas sebelumnya, channel bisa digunakan untuk mengirim dan menerima data
+                2. Untuk mengirim data, kita bisa gunakan kode : channel <- data
+                3. Sedangkan untuk menerima data, bisa gunakan kode : data <- channel
+                4. Jika selesai, jangan lupa untuk menutup channel menggunakan function close()
+
+        -- Channel Sebagai Parameter
+                1. Dalam kenyataan pembuatan aplikasi, seringnya kita akan mengirim channel ke function lain via parameter
+                2. Sebelumnya kita tahu bahkan di Go-Lang by default, parameter adalah pass by value, artinya value akan
+                   diduplikasi lalu dikirim ke function parameter, sehingga jika kita ingin mengirim data asli,
+                   kita biasa gunakan pointer (agar pass by reference).
+                3. Berbeda dengan Channel, kita tidak perlu melakukan hal tersebut
+
+        -- Channel In dan Out
+                1. Saat kita mengirim channel sebagai parameter, isi function tersebut bisa mengirim dan menerima data
+                   dari channel tersebut
+                2. Kadang kita ingin memberi tahu terhadap function, misal bahwa channel tersebut hanya digunakan untuk
+                   mengirim data, atau hanya dapat digunakan untuk menerima data
+                3. Hal ini bisa kita lakukan di parameter dengan cara menandai apakah channel ini
+                   digunakan untuk in (mengirim data) atau out (menerima data)
+
+        -- Buffered Channel
+                1. Seperti yang dijelaskan sebelumnya, bahwa secara default channel itu hanya bisa menerima 1 data
+                2. Artinya jika kita menambah data ke-2, maka kita akan diminta menunggu sampai data ke-1 ada yang mengambil
+                3. Kadang-kadang ada kasus dimana pengirim lebih cepat dibanding penerima, dalam hal ini jika kita menggunakan channel,
+                   maka otomatis pengirim akan ikut lambat juga
+                4. Untuknya ada Buffered Channel, yaitu buffer yang bisa digunakan untuk menampung data antrian di Channel
+
+                Buffer Capacity
+                1. Kita bebas memasukkan berapa jumlah kapasitas antrian di dalam buffer
+                2. Jika kita set misal 5, artinya kita bisa menerima 5 data di buffer.
+                3. Jika kita mengirim data ke 6, maka kita diminta untuk menunggu sampai buffer ada yang kosong
+                4.  Ini cocok sekali ketika memang goroutine yang menerima data lebih lambat dari yang mengirim data
+
+        -- Range Channel
+                1. Kadang-kadang ada kasus sebuah channel dikirim data secara terus menerus oleh pengirim
+                2. Dan kadang tidak jelas kapan channel tersebut akan berhenti menerima data
+                3. Salah satu yang bisa kita lakukan adalah dengan menggunakan perulangan range ketika menerima data dari channel
+                4. Ketika sebuah channel di close(), maka secara otomatis perulangan tersebut akan berhenti
+                5. Ini lebih sederhana dari pada kita melakukan pengecekan channel secara manual
+
+        -- Select Channel
+                1. Kadang ada kasus dimana kita membuat beberapa channel, dan menjalankan beberapa goroutine
+                2. Lalu kita ingin mendapatkan data dari semua channel tersebut (for range cuma untuk 1 channel saja, tidak cocok dalam case ini)
+                3. Untuk melakukan hal tersebut, kita bisa menggunakan select channel di Go-Lang
+                4. Dengan select channel, kita bisa memilih data tercepat dari beberapa channel, jika data datang secara
+                   bersamaan di beberapa channel, maka akan dipilih secara random
+
+        -- Default Select
+                1. Apa yang terjadi jika kita melakukan select terhadap channel yang ternyata tidak ada datanya?
+                2. Maka kita akan menunggu sampai data ada
+                3. Kadang mungkin kita ingin melakukan sesuatu jika misal semua channel tidak ada datanya ketika kita melakukan select channel
+                4. Dalam select, kita bisa menambahkan default, dimana ini akan dieksekusi jika memang di semua channel yang kita select tidak ada datanya
+
+-- Race Condition
+        1. Saat kita menggunakan goroutine, dia tidak hanya berjalan secara concurrent, tapi bisa parallel juga,
+           karena bisa ada beberapa thread yang berjalan secara parallel
+        2. Hal ini sangat berbahaya ketika kita melakukan manipulasi data variable yang sama oleh beberapa goroutine
+           secara bersamaan
+        3. Hal ini bisa menyebabkan masalah yang namanya Race Condition
+
+-- sync.Mutex
+        -- Mutex (Mutual Exclusion) -- konsekuensi lambat
+                1. Untuk mengatasi masalah race condition tersebut, di Go-Lang terdapat sebuah struct bernama sync.Mutex
+                2. Mutex bisa digunakan untuk melakukan locking dan unlocking, dimana ketika kita melakukan locking
+                   terhadap mutex, maka tidak ada yang bisa melakukan locking lagi sampai kita melakukan unlock
+                3. Dengan demikian, jika ada beberapa goroutine melakukan lock terhadap Mutex, maka hanya 1 goroutine
+                   yang diperbolehkan, setelah goroutine tersebut melakukan unlock, baru goroutine selanjutnya
+                   diperbolehkan melakukan lock lagi
+                4. Ini sangat cocok sebagai solusi ketika ada masalah race condition yang sebelumnya kita hadapi
+
+        -- sync.RWMutex
+                1. Kadang ada kasus dimana kita ingin melakukan locking tidak hanya pada proses mengubah data,
+                   tapi juga membaca data
+                2. Kita sebenarnya bisa menggunakan Mutex saja, namun masalahnya nanti akan rebutan antara proses membaca
+                   dan mengubah
+                3. Di Go-Lang telah disediakan struct RWMutex (Read Write Mutex) untuk menangani hal ini, dimana Mutex jenis
+                   ini memiliki dua lock, lock untuk Read dan lock untuk Write
+
+-- Deadlock
+        1. Hati-hati saat membuat aplikasi yang parallel atau concurrent, masalah yang sering kita hadapi adalah Deadlock
+        2. Deadlock adalah keadaan dimana sebuah proses goroutine saling menunggu lock sehingga tidak ada satupun
+           goroutine yang bisa jalan
+        3. Sekarang kita coba simulasikan proses deadlock
+
+-- sync.WaitGroup
+        1. WaitGroup adalah fitur yang bisa digunakan untuk menunggu sebuah proses selesai dilakukan
+        2. Hal ini kadang diperlukan, misal kita ingin menjalankan beberapa proses menggunakan goroutine
+           (tidak hanya 1 goroutine, tapi bisa banyak), tapi kita ingin semua proses selesai terlebih dahulu sebelum aplikasi kita selesai
+        3. Kasus seperti ini bisa menggunakan WaitGroup
+        4. Untuk menandai bahwa ada proses goroutine, kita bisa menggunakan method Add(int), setelah proses goroutine selesai,
+           kita bisa gunakan method Done()
+        5. Untuk menunggu semua proses selesai, kita bisa menggunakan method Wait()
+
+-- sync.Once
+        1. Once adalah fitur di Go-Lang yang bisa kita gunakan untuk memastikan bahsa sebuah function di eksekusi hanya sekali
+        2. Jadi berapa banyak pun goroutine yang mengakses, bisa dipastikan bahwa goroutine yang pertama yang bisa mengeksekusi
+           function nya
+        3. Goroutine yang lain akan di hiraukan, artinya function tidak akan dieksekusi lagi
+
+-- sync.Pool
+        1. Pool adalah implementasi design pattern bernama object pool pattern.
+        2. Sederhananya, design pattern Pool ini digunakan untuk menyimpan data, selanjutnya untuk menggunakan datanya,
+           kita bisa mengambil dari Pool, dan setelah selesai menggunakan datanya, kita bisa menyimpan kembali ke Pool nya
+        3. Implementasi Pool di Go-Lang ini sudah aman dari problem race condition
+
+-- sync.Map
+        1. Go-Lang memiliki sebuah struct beranama sync.Map
+        2. Map ini mirip Go-Lang map, namun yang membedakan, Map ini aman untuk menggunaan concurrent menggunakan goroutine
+        3. Ada beberapa function yang bisa kita gunakan di Map :
+            1. Store(key, value) untuk menyimpan data ke Map
+            2. Load(key) untuk mengambil data dari Map menggunakan key
+            3. Delete(key) untuk menghapus data di Map menggunakan key
+            4. Range(function(key, value)) digunakan untuk melakukan iterasi seluruh data di Map
+
+-- sync.Cond
+        1. Cond adalah adalah implementasi locking berbasis kondisi.
+        2. Cond membutuhkan Locker (bisa menggunakan Mutex atau RWMutex) untuk implementasi locking nya, namun berbeda
+           dengan Locker biasanya, di Cond terdapat function Wait() untuk menunggu apakah perlu menunggu atau tidak
+        3. Function Signal() bisa digunakan untuk memberi tahu sebuah goroutine agar tidak perlu menunggu lagi, sedangkan
+           function Broadcast() digunakan untuk memberi tahu semua goroutine agar tidak perlu menunggu lagi
+        4. Untuk membuat Cond, kita bisa menggunakan function sync.NewCond(Locker)
+
+-- Atomic
+        1. Go-Lang memiliki package yang bernama sync/atomic
+        2. Atomic merupakan package yang digunakan untuk menggunakan data primitive secara aman pada proses concurrent
+        3. Contohnya sebelumnya kita telah menggunakan Mutex untuk melakukan locking ketika ingin menaikkan angka di counter. Hal ini sebenarnya bisa digunakan menggunakan Atomic package
+        4. Ada banyak sekali function di atomic package, kita bisa eksplore sendiri di halaman dokumentasinya
+        5. https://golang.org/pkg/sync/atomic/
+
+-- time.Timer
+        1. Timer adalah representasi satu kejadian
+        2. Ketika waktu timer sudah expire, maka event akan dikirim ke dalam channel
+        3. Untuk membuat Timer kita bisa menggunakan time.NewTimer(duration)
+
+        -- time.After()
+                1. Kadang kita hanya butuh channel nya saja, tidak membutuhkan data Timer nya
+                2. Untuk melakukan hal itu kita bisa menggunakan function time.After(duration)
+
+        -- time.AfterFunc()
+                1. Kadang ada kebutuhan kita ingin menjalankan sebuah function dengan delay waktu tertentu
+                2. Kita bisa memanfaatkan Timer dengan menggunakan function time.AfterFunc()
+                3. Kita tidak perlu lagi menggunakan channel nya, cukup kirim kan function yang akan dipanggil ketika Timer mengirim kejadiannya
+
+-- time.Ticker
+        1. Ticker adalah representasi kejadian yang berulang
+        2. Ketika waktu ticker sudah expire, maka event akan dikirim ke dalam channel
+        3. Untuk membuat ticker, kita bisa menggunakan time.NewTicker(duration)
+        4. Untuk menghentikan ticker, kita bisa menggunakan Ticker.Stop()
+
+        -- time.Tick()
+                1. Kadang kita tidak butuh data Ticker nya, kita hanya butuh channel nya saja
+                2. Jika demikian, kita bisa menggunakan function timer.Tick(duration), function ini tidak akan
+                   mengembalikan Ticker, hanya mengembalikan channel timer nya saja
+
+-- GOMAXPROCS
+        1. Sebelumnya diawal kita sudah bahas bahwa goroutine itu sebenarnya dijalankan di dalam Thread
+        2. Pertanyaannya, seberapa banyak Thread yang ada di Go-Lang ketika aplikasi kita berjalan?
+        3. Untuk mengetahui berapa jumlah Thread, kita bisa menggunakan GOMAXPROCS, yaitu sebuah function di package
+           runtime yang bisa kita gunakan untuk mengubah jumlah thread atau mengambil jumlah thread
+        4. Secara default, jumlah thread di Go-Lang itu sebanyak jumlah CPU di komputer kita.
+        5. Kita juga bisa melihat berapa jumlah CPU kita dengan menggunakan function runtime.NumCpu()
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
